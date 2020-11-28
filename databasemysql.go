@@ -10,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//
+// ???
 func exec(db *sql.DB, sql string) sql.Result {
 	result, err := db.Exec(sql)
 	if err != nil {
@@ -40,7 +40,7 @@ func main() {
 	fmt.Println("Sucesso.")
 
 	// Criando tabelas
-
+	// Cria tabela Lojas
 	fmt.Println("Criando Tabela Lojas.")
 	exec(db, `CREATE TABLE IF NOT EXISTS lojas(
 		loja_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -50,6 +50,7 @@ func main() {
 	)`)
 	fmt.Println("Sucesso.")
 
+	// Cria tabela Produtos
 	fmt.Println("Criando Tabela Produtos.")
 	exec(db, `CREATE TABLE IF NOT EXISTS produtos(
 		produto_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,6 +62,7 @@ func main() {
 	)`)
 	fmt.Println("Sucesso.")
 
+	// Cria tabela Estoque
 	fmt.Println("Criando Tabela Estoque.")
 	exec(db, `CREATE TABLE IF NOT EXISTS estoques(
 		loja_id INT NOT NULL,
@@ -73,6 +75,7 @@ func main() {
 `)
 	fmt.Println("Sucesso.")
 
+	// Cria tabela Categorias.
 	fmt.Println("Criando tabela categorias.")
 	exec(db, `CREATE TABLE IF NOT EXISTS categoria(
 		categoria_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,6 +83,7 @@ func main() {
 	)`)
 	fmt.Println("Sucesso.")
 
+	// Cria tabela Marcas.
 	fmt.Println("Criando tabela marcas.")
 	exec(db, `CREATE TABLE IF NOT EXISTS marcas(
 		marcas_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -94,7 +98,7 @@ func main() {
 	codigo := 0
 	totalregistros := 0
 
-	// Cria catégoria (Input do usuario)
+	// Cria uma nova catégoria (Input do usuario)
 	for {
 		fmt.Println("Informe um nome para a categoria: ")
 		fmt.Scanln(&categoria)
@@ -108,6 +112,8 @@ func main() {
 		if resposta != "s" {
 			break
 		}
+
+		// ???
 		rows, _ := db.Query("select max(categoria_id) as ultimo from categorias")
 		defer rows.Close()
 		for rows.Next() {
@@ -115,16 +121,20 @@ func main() {
 			codigo = codigo + 1
 		}
 
+		// ???
 		totalregistros = len(categorias)
 
+		// ???
 		tx, _ := db.Begin()
 		stmt, _ := tx.Prepare("insert into categorias(categoria_id, categoria) values(?,?)")
 
+		// Faz o incremento no categoria_id ???
 		for i := 0; i < totalregistros; i++ {
 			stmt.Exec(codigo, categorias[i])
 			codigo = codigo + 1
 		}
 
+		// ???
 		if err != nil {
 			tx.Rollback()
 			log.Fatal(err)
