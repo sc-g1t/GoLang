@@ -40,6 +40,7 @@ func main() {
 	fmt.Println("Sucesso.")
 
 	// Criando tabelas
+
 	// Cria tabela Lojas
 	fmt.Println("Criando Tabela Lojas.")
 	exec(db, `CREATE TABLE IF NOT EXISTS lojas(
