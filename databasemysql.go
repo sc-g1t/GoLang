@@ -91,8 +91,7 @@ func main() {
 	var categorias []string
 	categoria := ""
 	resposta := ""
-	categoria_id := 0
-	//codigo := 0
+	codigo := 0
 	totalregistros := 0
 
 	// Cria catégoria (Input do usuario)
@@ -112,8 +111,8 @@ func main() {
 		rows, _ := db.Query("select max(categoria_id) as ultimo from categorias")
 		defer rows.Close()
 		for rows.Next() {
-			rows.Scan(&categoria_id)
-			categoria_id = categoria_id + 1
+			rows.Scan(&codigo)
+			codigo = codigo + 1
 		}
 
 		totalregistros = len(categorias)
@@ -122,8 +121,8 @@ func main() {
 		stmt, _ := tx.Prepare("insert into categorias(categoria_id, categoria) values(?,?)")
 
 		for i := 0; i < totalregistros; i++ {
-			stmt.Exec(categoria_id, categorias[i])
-			categoria_id = categoria_id + 1
+			stmt.Exec(codigo, categorias[i])
+			codigo = codigo + 1
 		}
 
 		if err != nil {
