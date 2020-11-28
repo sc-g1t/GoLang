@@ -89,7 +89,7 @@ func main() {
 	// Cria tabela Categorias.
 	time.Sleep(500 * time.Millisecond)
 	fmt.Println("Criando tabela categorias.")
-	exec(db, `CREATE TABLE IF NOT EXISTS categoria(
+	exec(db, `CREATE TABLE IF NOT EXISTS categorias(
 		categoria_id INT AUTO_INCREMENT PRIMARY KEY,
 		categoria_nome VARCHAR(40)
 	)`)
@@ -120,9 +120,7 @@ func main() {
 		fmt.Scanln(&categoria)
 		categorias = append(categorias, categoria)
 
-		fmt.Println("cadastrando a categoria:", categoria)
-
-		fmt.Println("Deseja cadastrar uma nova categoria? s/n")
+		fmt.Println("Deseja cadastrar a categoria? s/n")
 		fmt.Scanln(&resposta)
 
 		if resposta != "s" {
