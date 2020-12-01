@@ -104,8 +104,9 @@ func main() {
 	marca := ""
 	categoria := ""
 	resposta := ""
-	codigo := 0
+	nome := ""
 	totalregistros := 0
+	codigo := 0
 
 	// Boas-vindas
 	fmt.Println("\n\n------ Seja bem-vindo ! ------")
@@ -133,46 +134,44 @@ func main() {
 			fmt.Scanln(&resposta)
 
 			if resposta == "s" {
+				codigo := 0
 				for {
 					fmt.Println("Informe um nome para a categoria: ")
 					fmt.Scanln(&categoria)
 					categorias = append(categorias, categoria)
 
-					fmt.Println("Deseja cadastrar a categoria? s/n")
+					fmt.Println("Deseja cadastrar outra categoria? s/n")
 					fmt.Scanln(&resposta)
 
 					if resposta != "s" {
 						break
 					}
-
-					// ???
-					rows, _ := db.Query("select max(categoria_id) as ultimo from categorias")
-					defer rows.Close()
-					for rows.Next() {
-						rows.Scan(&codigo)
-						codigo = codigo + 1
-					}
-
-					// ???
-					totalregistros = len(categorias)
-
-					// ???
-					tx, _ := db.Begin()
-					stmt, _ := tx.Prepare("insert into categorias(categoria_id, categoria_nome) values(?,?)")
-
-					// ??? Faz o incremento no categoria_id ???
-					for i := 0; i < totalregistros; i++ {
-						stmt.Exec(codigo, categorias[i])
-						codigo = codigo + 1
-					}
-
-					// ???
-					if err != nil {
-						tx.Rollback()
-						log.Fatal(err)
-					}
-					tx.Commit()
 				}
+
+				// Seleciona o max(categoria_id) como tamanho do código + executa db.Query que acessa o BD
+				rows, _ := db.Query("select max(categoria_id) as ultimo from categorias")
+				defer rows.Close()
+				for rows.Next() {
+					rows.Scan(&codigo)
+					codigo = codigo + 1
+				}
+				totalregistros = len(categorias)
+				tx, _ := db.Begin()
+				stmt, _ := tx.Prepare("insert into categorias(categoria_id, categoria_nome) values(?,?)")
+
+				// ??? Faz o incremento no categoria_id ???
+				for i := 0; i < totalregistros; i++ {
+					stmt.Exec(codigo, categorias[i])
+					codigo = codigo + 1
+
+				}
+
+				// ???
+				if err != nil {
+					tx.Rollback()
+					log.Fatal(err)
+				}
+				tx.Commit()
 			}
 
 		case "2":
@@ -181,47 +180,44 @@ func main() {
 			fmt.Println("Gostaria de adicionar uma nova marca? s/n")
 			fmt.Scanln(&resposta)
 			if resposta == "s" {
+				codigo := 0
+
 				for {
 					fmt.Println("Informe um nome para a marca: ")
 					fmt.Scanln(&marca)
-					categorias = append(marcas, marca)
+					marcas = append(marcas, marca)
 
-					fmt.Println("Deseja cadastrar a marca? s/n")
+					fmt.Println("Deseja cadastrar outra marca? s/n")
 					fmt.Scanln(&resposta)
 
 					if resposta != "s" {
 						break
 					}
-
-					// ???
-					rows, _ := db.Query("select max(marca_id) as ultimo from marcas")
-					defer rows.Close()
-					for rows.Next() {
-						rows.Scan(&codigo)
-						codigo = codigo + 1
-					}
-
-					// ???
-					totalregistros = len(marcas)
-
-					// ???
-					tx, _ := db.Begin()
-					stmt, _ := tx.Prepare("insert into marcas(marca_id, marca_nome) values(?,?)")
-
-					// ??? Faz o incremento no categoria_id ???
-					for i := 0; i < totalregistros; i++ {
-						stmt.Exec(codigo, marcas[i])
-						codigo = codigo + 1
-					}
-
-					// ???
-					if err != nil {
-						tx.Rollback()
-						log.Fatal(err)
-					}
-					tx.Commit()
 				}
+
+				rows, _ := db.Query("select max(marca_id) as ultimo from marcas")
+				defer rows.Close()
+				for rows.Next() {
+					rows.Scan(&codigo)
+					codigo = codigo + 1
+				}
+
+				totalregistros = len(marcas)
+				tx, _ := db.Begin()
+				stmt, _ := tx.Prepare("insert into marcas(marca_id, marca_nome) values(?,?)")
+
+				for i := 0; i < totalregistros; i++ {
+					stmt.Exec(codigo, marcas[i])
+					codigo = codigo + 1
+				}
+
+				if err != nil {
+					tx.Rollback()
+					log.Fatal(err)
+				}
+				tx.Commit()
 			}
+
 		case "3":
 
 			rows, _ := db.Query("select categoria_id, categoria_nome from categorias")
@@ -244,6 +240,27 @@ func main() {
 				fmt.Println(c)
 			}
 
+		case "5":
+			fmt.Print("Informe o código da Categoria que deseja atualizar: ")
+			fmt.Scanln(&codigo)
+
+			fmt.Print("Informe o novo nome da Categoria que deseja atualizar: ")
+			fmt.Scanln(&nome)
+
+			// update
+			stmt, _ := db.Prepare("Update categorias set categoria_nome = ? where categoria_id = ?")
+			stmt.Exec(nome, codigo)
+
+		case "6":
+			fmt.Println("Informe o código da Marca que deseja atualizar: ")
+			fmt.Scanln(&codigo)
+
+			fmt.Println("Informe o novo nome da Marca que deseja atualizar: ")
+			fmt.Scanln(&nome)
+
+			// Update
+			stmt, _ := db.Prepare("Update marcas set marca_nome = ? where marca_id = ?")
+			stmt.Exec(nome, codigo)
 		case "7":
 			exec(db, `DROP TABLE categorias`)
 			resposta = "0"
